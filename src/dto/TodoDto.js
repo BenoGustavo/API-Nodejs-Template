@@ -1,5 +1,6 @@
 export class TodoDto {
-    constructor(name) {
+    constructor(name,done) {
         this.name = name;
+        this.done = done;
     }
 }
