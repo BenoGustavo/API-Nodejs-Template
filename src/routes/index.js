@@ -1,26 +1,16 @@
 import { Router } from 'express';
-import { ResponseDto } from '../dto/response/ResponseDto';
-import { listRouter } from './list/ListRouter';
 import { NotFound } from '../errors/http/NotFound';
+import { sayHelloWorld } from './ping/helloWorld';
 
-
-/**
- * Simple responser placeholder
- * @param {Request} req
- * @param {Response} res
-*/
-async function sayHelloWorld(req, res) {
-  const response = new ResponseDto(200, 'Hello World',  {
-    message : 'Hello World',
-  });
-  
-  res.status(200).json(response);
-}
+// Routers
+import { listRouter } from './list/ListRouter';
+import { toDoRouter } from './todos/ToDoRouter';
 
 // start of routes
 const routes = new Router();
 routes.get('/', sayHelloWorld);
 routes.use('/list', listRouter);
+routes.use('/todo', toDoRouter);
 
 // Catch-all route for handling 404 errors
 routes.use((req, res, next) => {
