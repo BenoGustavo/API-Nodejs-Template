@@ -10,5 +10,10 @@ export class ResponseDto {
       this.status = status;
       this.message = message;
       this.data = data;
+      this.error = null;
+    }
+
+    setError(errorObject) {
+      this.error = errorObject;
     }
   }
