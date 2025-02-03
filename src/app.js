@@ -2,10 +2,10 @@ import 'dotenv/config';
 import express from 'express';
 import 'express-async-errors';
 import cors from 'cors';
-import path from 'path';
-import Youch from 'youch';
-
+import './database/Connection';
 import routes from './routes';
+import { GlobalErrorHandler } from './middlewares/GlobalErrorHandler'; 
+
 /**
  * Base app - class based.
  */
@@ -14,7 +14,7 @@ class App {
     this.server = express();
     this.middlewares();
     this.routes();
-    this.exceptionHandler();
+    this.errorHandling();
   }
 
   /**
@@ -34,16 +34,14 @@ class App {
   }
 
   /**
-   * Default exception handler (that method prevent the app from broke)
+   * Error handling middleware
    */
-  exceptionHandler() {
-    this.server.use(async (err, req, res, _next) => {
-      if (process.env.NODE_ENV === 'development') {
-        const errors = await new Youch(err, req).toJSON();
-        return res.status(500).json(errors);
-      }
-
-      return res.status(500).json({ error: 'Internal server error' });
+  errorHandling() {
+    this.server.use((err, req, res, next) => {
+      console.error(
+        `❌ Error ❌: ${err.message}\n⚠️ Stack ⚠️: ${err.stack} \n`
+      )
+      GlobalErrorHandler(err, req, res, next);
     });
   }
 }
