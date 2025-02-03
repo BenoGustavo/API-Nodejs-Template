@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
-import { toDoSchema } from './TodoSchema';
 
 export const listSchema = new mongoose.Schema({
-    name: { type: String, required: true, unique: true },
-    items: [toDoSchema]
+    name: { type: String, required: true, unique: true, trim: true },
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ToDo' }]
 });
 
 export const List = mongoose.model('List', listSchema);

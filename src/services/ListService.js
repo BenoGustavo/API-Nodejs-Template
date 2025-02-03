@@ -17,7 +17,7 @@ export class ListService {
     /**
      * Creates a new list
      * @param {ListDto} data
-     * @returns {Promise<ListDto>}
+     * @returns {List}
      */
     async createList(data) {
         try {
@@ -31,7 +31,7 @@ export class ListService {
 
     /**
      * Gets all lists
-     * @returns {Promise<ListDto[]>}
+     * @returns {List}
      */
     async getLists() { 
         try {
@@ -44,7 +44,7 @@ export class ListService {
     /**
      * Gets a list by id
      * @param {string} id
-     * @returns {Promise<ListDto>}
+     * @returns {List}
      */
     async getListById(id) {
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -61,7 +61,7 @@ export class ListService {
      * Updates a list
      * @param {string} id
      * @param {ListDto} data
-     * @returns {Promise<ListDto>}
+     * @returns {List}
      */
     async updateList(id, data) {
         try {
