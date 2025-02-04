@@ -5,12 +5,14 @@ import { sayHelloWorld } from './ping/helloWorld';
 // Routers
 import { listRouter } from './list/ListRouter';
 import { toDoRouter } from './todos/ToDoRouter';
+import { userRouter } from './user/UserRouter';
 
 // start of routes
 const routes = new Router();
 routes.get('/', sayHelloWorld);
 routes.use('/list', listRouter);
 routes.use('/todo', toDoRouter);
+routes.use('/user', userRouter);
 
 // Catch-all route for handling 404 errors
 routes.use((req, res, next) => {
