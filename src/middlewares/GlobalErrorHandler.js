@@ -11,11 +11,13 @@ export const GlobalErrorHandler = async (err, req, res, next) => {
 
     const errCode = err.code || 500;
     const errMsg = err.message || 'Something went wrong';
+    const image = err.image || null;
 
     let response = new ResponseDto()
     response.setError({
         status: errCode,
         message: errMsg,
+        image: image
     });
 
     res.status(errCode).json(response);
