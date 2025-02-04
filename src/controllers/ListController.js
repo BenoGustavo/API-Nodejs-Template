@@ -8,17 +8,17 @@ export class ListController {
     */
     constructor(listService) {
         this.listService = listService;
+        this.createList = this.createList.bind(this);
+        this.getLists = this.getLists.bind(this);
+        this.getListById = this.getListById.bind(this);
+        this.updateList = this.updateList.bind(this);
+        this.deleteList = this.deleteList.bind(this);
     }
 
-    /**
-     * @param {Request} req 
-     * @param {Response} res 
-     * 
-     * @returns {Promise<Response>}
-    */
     async createList(req, res, next) {
         try {
-            const list = await this.listService.createList(req.body);
+            const data = { ...req.body, user: req.user.id };
+            const list = await this.listService.createList(data);
             res.status(201).json(list);
         } catch (error) {
             next(error);
