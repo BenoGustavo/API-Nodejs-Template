@@ -2,6 +2,8 @@ import { ToDoController } from '../controllers/ToDoController';
 import { ToDoService } from '../services/ToDoService';
 import { jest } from '@jest/globals';
 
+jest.mock('../services/ToDoService');
+
 describe('ToDoController', () => {
     let toDoService;
     let toDoController;
@@ -12,7 +14,11 @@ describe('ToDoController', () => {
     beforeEach(() => {
         toDoService = new ToDoService();
         toDoController = new ToDoController(toDoService);
-        req = { body: {}, params: {} };
+        req = {
+            params: {},
+            user: { id: 'userId' },
+            body: {}
+        };
         res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
@@ -23,20 +29,21 @@ describe('ToDoController', () => {
 
     describe('createToDo', () => {
         it('should create a new ToDo and return 201 status', async () => {
-            const toDo = { id: 1, title: 'Test ToDo' };
-            toDoService.createToDo = jest.fn().mockResolvedValue(toDo);
+            const toDo = { id: 'toDoId' };
+            toDoService.createToDo.mockResolvedValue(toDo);
+            req.params.listId = 'listId';
             req.body = { title: 'Test ToDo' };
 
             await toDoController.createToDo(req, res, next);
 
-            expect(toDoService.createToDo).toHaveBeenCalledWith(req.params.listId,req.body);
+            expect(toDoService.createToDo).toHaveBeenCalledWith('listId', 'userId', req.body);
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(toDo);
         });
 
         it('should call next with error if service fails', async () => {
             const error = new Error('Service Error');
-            toDoService.createToDo = jest.fn().mockRejectedValue(error);
+            toDoService.createToDo.mockRejectedValue(error);
 
             await toDoController.createToDo(req, res, next);
 
@@ -46,8 +53,8 @@ describe('ToDoController', () => {
 
     describe('getToDos', () => {
         it('should retrieve all ToDos and return 200 status', async () => {
-            const toDos = [{ id: 1, title: 'Test ToDo' }];
-            toDoService.getToDos = jest.fn().mockResolvedValue(toDos);
+            const toDos = [{ id: 'toDoId' }];
+            toDoService.getToDos.mockResolvedValue(toDos);
 
             await toDoController.getToDos(req, res, next);
 
@@ -58,7 +65,7 @@ describe('ToDoController', () => {
 
         it('should call next with error if service fails', async () => {
             const error = new Error('Service Error');
-            toDoService.getToDos = jest.fn().mockRejectedValue(error);
+            toDoService.getToDos.mockRejectedValue(error);
 
             await toDoController.getToDos(req, res, next);
 
@@ -68,20 +75,20 @@ describe('ToDoController', () => {
 
     describe('getToDosByListId', () => {
         it('should retrieve ToDos by list id and return 200 status', async () => {
-            const toDos = [{ id: 1, title: 'Test ToDo' }];
-            toDoService.getToDosByListId = jest.fn().mockResolvedValue(toDos);
-            req.params.id = 1;
+            const toDos = [{ id: 'toDoId' }];
+            toDoService.getToDosByListId.mockResolvedValue(toDos);
+            req.params.id = 'listId';
 
             await toDoController.getToDosByListId(req, res, next);
 
-            expect(toDoService.getToDosByListId).toHaveBeenCalledWith(req.params.id);
+            expect(toDoService.getToDosByListId).toHaveBeenCalledWith('userId', 'listId');
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(toDos);
         });
 
         it('should call next with error if service fails', async () => {
             const error = new Error('Service Error');
-            toDoService.getToDosByListId = jest.fn().mockRejectedValue(error);
+            toDoService.getToDosByListId.mockRejectedValue(error);
 
             await toDoController.getToDosByListId(req, res, next);
 
@@ -91,31 +98,30 @@ describe('ToDoController', () => {
 
     describe('getToDoById', () => {
         it('should retrieve a ToDo by id and return 200 status', async () => {
-            const toDo = { id: 1, title: 'Test ToDo' };
-            toDoService.getToDoById = jest.fn().mockResolvedValue(toDo);
-            req.params.id = 1;
+            const toDo = { id: 'toDoId' };
+            toDoService.getToDoById.mockResolvedValue(toDo);
+            req.params.id = 'toDoId';
 
             await toDoController.getToDoById(req, res, next);
 
-            expect(toDoService.getToDoById).toHaveBeenCalledWith(req.params.id);
+            expect(toDoService.getToDoById).toHaveBeenCalledWith('userId', 'toDoId');
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(toDo);
         });
 
         it('should return 404 if ToDo not found', async () => {
-            toDoService.getToDoById = jest.fn().mockResolvedValue(null);
-            req.params.id = 1;
+            toDoService.getToDoById.mockResolvedValue(null);
+            req.params.id = 'toDoId';
 
             await toDoController.getToDoById(req, res, next);
 
-            expect(toDoService.getToDoById).toHaveBeenCalledWith(req.params.id);
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'ToDo not found' });
         });
 
         it('should call next with error if service fails', async () => {
             const error = new Error('Service Error');
-            toDoService.getToDoById = jest.fn().mockRejectedValue(error);
+            toDoService.getToDoById.mockRejectedValue(error);
 
             await toDoController.getToDoById(req, res, next);
 
@@ -125,21 +131,21 @@ describe('ToDoController', () => {
 
     describe('updateToDo', () => {
         it('should update a ToDo and return 200 status', async () => {
-            const toDo = { id: 1, title: 'Updated ToDo' };
-            toDoService.updateToDo = jest.fn().mockResolvedValue(toDo);
-            req.params.id = 1;
+            const toDo = { id: 'toDoId' };
+            toDoService.updateToDo.mockResolvedValue(toDo);
+            req.params.id = 'toDoId';
             req.body = { title: 'Updated ToDo' };
 
             await toDoController.updateToDo(req, res, next);
 
-            expect(toDoService.updateToDo).toHaveBeenCalledWith(req.params.id, req.body);
+            expect(toDoService.updateToDo).toHaveBeenCalledWith('toDoId', 'userId', req.body);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(toDo);
         });
 
         it('should call next with error if service fails', async () => {
             const error = new Error('Service Error');
-            toDoService.updateToDo = jest.fn().mockRejectedValue(error);
+            toDoService.updateToDo.mockRejectedValue(error);
 
             await toDoController.updateToDo(req, res, next);
 
@@ -149,19 +155,19 @@ describe('ToDoController', () => {
 
     describe('deleteToDo', () => {
         it('should delete a ToDo and return 204 status', async () => {
-            toDoService.deleteToDo = jest.fn().mockResolvedValue();
-            req.params.id = 1;
+            toDoService.deleteToDo.mockResolvedValue();
+            req.params.id = 'toDoId';
 
             await toDoController.deleteToDo(req, res, next);
 
-            expect(toDoService.deleteToDo).toHaveBeenCalledWith(req.params.id);
+            expect(toDoService.deleteToDo).toHaveBeenCalledWith('userId', 'toDoId');
             expect(res.status).toHaveBeenCalledWith(204);
             expect(res.send).toHaveBeenCalled();
         });
 
         it('should call next with error if service fails', async () => {
             const error = new Error('Service Error');
-            toDoService.deleteToDo = jest.fn().mockRejectedValue(error);
+            toDoService.deleteToDo.mockRejectedValue(error);
 
             await toDoController.deleteToDo(req, res, next);
 

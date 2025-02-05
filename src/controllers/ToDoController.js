@@ -1,4 +1,3 @@
-import { NotFound } from "../errors/http/NotFound";
 import { ToDoService } from "../services/ToDoService";
 
 export class ToDoController {
