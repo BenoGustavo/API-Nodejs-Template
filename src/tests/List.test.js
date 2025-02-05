@@ -2,8 +2,8 @@ import { ListController } from '../controllers/ListController';
 import { ListService } from '../services/ListService';
 
 describe('ListController', () => {
-    let listService;
     let listController;
+    let listService;
     let req;
     let res;
     let next;
@@ -12,9 +12,9 @@ describe('ListController', () => {
         listService = new ListService();
         listController = new ListController(listService);
         req = {
-            body: {},
-            params: {},
-            user: { id: 'userId' }
+            user: { id: 'userId' },
+            params: { id: 'listId' },
+            body: { name: 'test list' }
         };
         res = {
             status: jest.fn().mockReturnThis(),
@@ -25,19 +25,17 @@ describe('ListController', () => {
 
     describe('createList', () => {
         it('should create a list and return 201 status', async () => {
-            const list = { id: 'listId', name: 'Test List' };
-            listService.createList = jest.fn().mockResolvedValue(list);
-            req.body = { name: 'Test List' };
+            listService.createList = jest.fn().mockResolvedValue(req.body);
 
             await listController.createList(req, res, next);
 
-            expect(listService.createList).toHaveBeenCalledWith({ name: 'Test List', user: 'userId' });
+            expect(listService.createList).toHaveBeenCalledWith({ ...req.body, user: req.user.id });
             expect(res.status).toHaveBeenCalledWith(201);
-            expect(res.json).toHaveBeenCalledWith(list);
+            expect(res.json).toHaveBeenCalledWith(req.body);
         });
 
         it('should call next with error if createList fails', async () => {
-            const error = new Error('Create list failed');
+            const error = new Error('Error creating list');
             listService.createList = jest.fn().mockRejectedValue(error);
 
             await listController.createList(req, res, next);
@@ -47,8 +45,8 @@ describe('ListController', () => {
     });
 
     describe('getLists', () => {
-        it('should return lists and 200 status', async () => {
-            const lists = [{ id: 'listId', name: 'Test List' }];
+        it('should get all lists and return 200 status', async () => {
+            const lists = [req.body];
             listService.getLists = jest.fn().mockResolvedValue(lists);
 
             await listController.getLists(req, res, next);
@@ -59,7 +57,7 @@ describe('ListController', () => {
         });
 
         it('should call next with error if getLists fails', async () => {
-            const error = new Error('Get lists failed');
+            const error = new Error('Error getting lists');
             listService.getLists = jest.fn().mockRejectedValue(error);
 
             await listController.getLists(req, res, next);
@@ -69,33 +67,19 @@ describe('ListController', () => {
     });
 
     describe('getListById', () => {
-        it('should return list and 200 status if list is found', async () => {
-            const list = { id: 'listId', name: 'Test List' };
-            listService.getListById = jest.fn().mockResolvedValue(list);
-            req.params.id = 'listId';
+        it('should get a list by id and return 200 status', async () => {
+            listService.getListById = jest.fn().mockResolvedValue(req.body);
 
             await listController.getListById(req, res, next);
 
-            expect(listService.getListById).toHaveBeenCalledWith('listId');
+            expect(listService.getListById).toHaveBeenCalledWith(req.user.id, req.params.id);
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith(list);
-        });
-
-        it('should return 404 status if list is not found', async () => {
-            listService.getListById = jest.fn().mockResolvedValue(null);
-            req.params.id = 'listId';
-
-            await listController.getListById(req, res, next);
-
-            expect(listService.getListById).toHaveBeenCalledWith('listId');
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.json).toHaveBeenCalledWith({ error: 'List not found' });
+            expect(res.json).toHaveBeenCalledWith(req.body);
         });
 
         it('should call next with error if getListById fails', async () => {
-            const error = new Error('Get list by id failed');
+            const error = new Error('Error getting list by id');
             listService.getListById = jest.fn().mockRejectedValue(error);
-            req.params.id = 'listId';
 
             await listController.getListById(req, res, next);
 
@@ -104,36 +88,19 @@ describe('ListController', () => {
     });
 
     describe('updateList', () => {
-        it('should update list and return 200 status if list is found', async () => {
-            const list = { id: 'listId', name: 'Updated List' };
-            listService.updateList = jest.fn().mockResolvedValue(list);
-            req.params.id = 'listId';
-            req.body = { name: 'Updated List' };
+        it('should update a list and return 200 status', async () => {
+            listService.updateList = jest.fn().mockResolvedValue(req.body);
 
             await listController.updateList(req, res, next);
 
-            expect(listService.updateList).toHaveBeenCalledWith('listId', { name: 'Updated List' });
+            expect(listService.updateList).toHaveBeenCalledWith(req.user.id, req.params.id, req.body);
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith(list);
-        });
-
-        it('should return 404 status if list is not found', async () => {
-            listService.updateList = jest.fn().mockResolvedValue(null);
-            req.params.id = 'listId';
-            req.body = { name: 'Updated List' };
-
-            await listController.updateList(req, res, next);
-
-            expect(listService.updateList).toHaveBeenCalledWith('listId', { name: 'Updated List' });
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.json).toHaveBeenCalledWith({ error: 'List not found' });
+            expect(res.json).toHaveBeenCalledWith(req.body);
         });
 
         it('should call next with error if updateList fails', async () => {
-            const error = new Error('Update list failed');
+            const error = new Error('Error updating list');
             listService.updateList = jest.fn().mockRejectedValue(error);
-            req.params.id = 'listId';
-            req.body = { name: 'Updated List' };
 
             await listController.updateList(req, res, next);
 
@@ -142,33 +109,19 @@ describe('ListController', () => {
     });
 
     describe('deleteList', () => {
-        it('should delete list and return 204 status if list is found', async () => {
-            const list = { id: 'listId', name: 'Test List' };
-            listService.deleteList = jest.fn().mockResolvedValue(list);
-            req.params.id = 'listId';
+        it('should delete a list and return 204 status', async () => {
+            listService.deleteList = jest.fn().mockResolvedValue();
 
             await listController.deleteList(req, res, next);
 
-            expect(listService.deleteList).toHaveBeenCalledWith('listId');
+            expect(listService.deleteList).toHaveBeenCalledWith(req.user.id, req.params.id);
             expect(res.status).toHaveBeenCalledWith(204);
             expect(res.json).toHaveBeenCalled();
         });
 
-        it('should return 404 status if list is not found', async () => {
-            listService.deleteList = jest.fn().mockResolvedValue(null);
-            req.params.id = 'listId';
-
-            await listController.deleteList(req, res, next);
-
-            expect(listService.deleteList).toHaveBeenCalledWith('listId');
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.json).toHaveBeenCalledWith({ error: 'List not found' });
-        });
-
         it('should call next with error if deleteList fails', async () => {
-            const error = new Error('Delete list failed');
+            const error = new Error('Error deleting list');
             listService.deleteList = jest.fn().mockRejectedValue(error);
-            req.params.id = 'listId';
 
             await listController.deleteList(req, res, next);
 

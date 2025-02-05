@@ -47,10 +47,8 @@ export class ListController {
     */
     async getListById(req, res, next) {
         try {
-            const list = await this.listService.getListById(req.params.id);
-            if (!list) {
-                return res.status(404).json({ error: 'List not found' });
-            }
+            const list = await this.listService.getListById(req.user.id,req.params.id);
+
             res.status(200).json(list);
         } catch (error) {
             next(error);
@@ -65,10 +63,8 @@ export class ListController {
     */
     async updateList(req, res, next) {
         try {
-            const list = await this.listService.updateList(req.params.id, req.body);
-            if (!list) {
-                return res.status(404).json({ error: 'List not found' });
-            }
+            const list = await this.listService.updateList(req.user.id,req.params.id, req.body);
+
             res.status(200).json(list);
         } catch (error) {
             next(error);
@@ -83,10 +79,7 @@ export class ListController {
     */
     async deleteList(req, res, next) {
         try {
-            const list = await this.listService.deleteList(req.params.id);
-            if (!list) {
-                return res.status(404).json({ error: 'List not found' });
-            }
+            await this.listService.deleteList(req.user.id,req.params.id);
             res.status(204).json();
         } catch (error) {
             next(error);

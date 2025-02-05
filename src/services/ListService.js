@@ -3,6 +3,7 @@ import { ListDto } from '../dto/ListDto';
 import mongoose from 'mongoose';
 import { InvalidIdError } from '../errors/InvalidIdError';
 import { NotFound } from '../errors/http/NotFound';
+import { Unauthorized } from '../errors/http/Unauthorized';
 import { adaptMongooseError } from '../errors/database/AdaptMongooseError';
 
 export class ListService {
@@ -43,29 +44,50 @@ export class ListService {
 
     /**
      * Gets a list by id
+     * 
+     * @param {string} userRequesterId
      * @param {string} id
      * @returns {List}
      */
-    async getListById(id) {
+    async getListById(userRequesterId,id) {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new InvalidIdError('Invalid ID format');
         }
+
         const list = await List.findById(id);
+
         if (!list) {
             throw new NotFound('List not found');
         }
+
+        if (list.user.toString() !== userRequesterId) {
+            throw new Unauthorized('You are not authorized to access this list, because youre not the owner');
+        }
+
         return list;
     }
 
     /**
      * Updates a list
+     * 
+     * @param {string} userRequesterId
      * @param {string} id
      * @param {ListDto} data
      * @returns {List}
      */
-    async updateList(id, data) {
+    async updateList(userRequesterId,id, data) {
         try {
-            return await List.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+            const list = await List.findById(id);
+
+            if (!list) {
+                throw new NotFound('List not found');
+            }
+
+            if (list.user.toString() !== userRequesterId) {
+                throw new Unauthorized('You are not authorized to update this list, because youre not the owner');
+            }
+
+            return await await List.findByIdAndUpdate(id, data, { new: true, runValidators: true });
         } catch (error) {
             throw adaptMongooseError(error);
         }
@@ -73,12 +95,29 @@ export class ListService {
 
     /**
      * Deletes a list
+     * 
+     * @param {string} userRequesterId
      * @param {string} id
      * @returns {void}
      */
-    async deleteList(id) {
+    async deleteList(userRequesterId,id) {
         try {
-            return await List.findByIdAndDelete(id);
+            const list = await List.findById(id);
+
+            if (!list) {
+                throw new NotFound('List not found');
+            }
+
+            console.log(
+                list.user.toString(),
+                userRequesterId
+            )
+
+            if (list.user.toString() !== userRequesterId) {
+                throw new Unauthorized('You are not authorized to delete this list, because youre not the owner');
+            }
+
+            return await list.deleteOne();
         } catch (error) {
             throw adaptMongooseError(error);
         }
