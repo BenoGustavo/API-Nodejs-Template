@@ -1,7 +1,6 @@
 import { ListService } from "../services/ListService";
 
 export class ListController {
-
     /**
      * ListController constructor
      * @param {ListService} listService

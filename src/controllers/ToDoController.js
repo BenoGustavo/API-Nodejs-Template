@@ -8,6 +8,13 @@ export class ToDoController {
     */
     constructor(toDoService) {
         this.toDoService = toDoService;
+
+        this.createToDo = this.createToDo.bind(this);
+        this.getToDos = this.getToDos.bind(this);
+        this.getToDosByListId = this.getToDosByListId.bind(this);
+        this.getToDoById = this.getToDoById.bind(this);
+        this.updateToDo = this.updateToDo.bind(this);
+        this.deleteToDo = this.deleteToDo.bind(this);
     }
 
     /**
