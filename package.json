@@ -25,6 +25,9 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "sucrase": "^3.35.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0",
     "youch": "^3.3.4"
   },
   "devDependencies": {
