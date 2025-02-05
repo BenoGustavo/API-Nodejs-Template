@@ -29,7 +29,7 @@ export class ToDoController {
     */
     async createToDo(req, res, next) {
         try {
-            const toDo = await this.toDoService.createToDo(req.params.listId,req.body);
+            const toDo = await this.toDoService.createToDo(req.params.listId,req.user.id,req.body);
             res.status(201).json(toDo);
         } catch (error) {
             next(error);
@@ -100,11 +100,7 @@ export class ToDoController {
     */
     async updateToDo(req, res, next) {
         try {
-            const toDo = await this.toDoService.updateToDo(req.params.id, req.body);
-
-            if(!toDo){
-                throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
-            }
+            const toDo = await this.toDoService.updateToDo(req.params.id,req.user.id,req.body);
 
             res.status(200).json(toDo);
         } catch (error) {
@@ -123,11 +119,7 @@ export class ToDoController {
     */
     async deleteToDo(req, res, next) {
         try {
-            const toDo = await this.toDoService.deleteToDo(req.params.id);
-
-            if(!toDo){
-                throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
-            }
+            const toDo = await this.toDoService.deleteToDo(req.user.id,req.params.id);
 
             res.status(204).send();
         } catch (error) {

@@ -4,6 +4,7 @@ import { TodoDto } from '../dto/TodoDto';
 import mongoose from 'mongoose';
 import { InvalidIdError } from '../errors/InvalidIdError';
 import { NotFound } from '../errors/http/NotFound';
+import { Unauthorized } from '../errors/http/Unauthorized';
 // import { BadRequest } from '../errors/http/BadRequest';
 import { adaptMongooseError } from '../errors/database/AdaptMongooseError';
 
@@ -19,12 +20,17 @@ export class ToDoService {
     /**
      * Creates a new ToDo
      * @param {string} listId
+     * @param {string} userRequesterId
      * @param {TodoDto} data
      * @returns {ToDo}
      */
-    async createToDo(listId,data) {
+    async createToDo(listId,userRequesterId,data) {
         try {
             const list = await List.findById(listId);
+
+            if(list.user != userRequesterId){
+                throw new Unauthorized('You are not allowed to create a ToDo in this list, try creating a new list');
+            }
 
             if (!list) {
                 throw new NotFound('List not found');
@@ -86,12 +92,29 @@ export class ToDoService {
     /**
      * Updates a ToDo
      * @param {string} id
+     * @param {string} userRequesterId
      * @param {TodoDto} data
      * @returns {ToDo}
      */
-    async updateToDo(id, data) {
+    async updateToDo(id,userRequesterId,data) {
         try {
-            return await ToDo.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+            const toDoOwner = await List.findOne({ items: id })
+
+            if (!toDoOwner) {
+                throw new NotFound('ToDo not found');
+            }
+
+            if (toDoOwner._id.toString() !== userRequesterId) {
+                throw new Unauthorized('You are not allowed to update this ToDo');
+            }
+
+            const toDo = await ToDo.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+
+            if(!toDo){
+                throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
+            }
+
+            return toDo;
         } catch (error) {
             throw adaptMongooseError(error);
         }
@@ -99,12 +122,30 @@ export class ToDoService {
 
     /**
      * Deletes a ToDo
+     * @param {string} userRequesterId
      * @param {string} id
      * @returns {void}
      */
-    async deleteToDo(id) {
+    async deleteToDo(userRequesterId,id) {
         try {
-            return await ToDo.findOneAndDelete(id);
+
+            const toDoOwner = await List.findOne({ items: id })
+
+            if (!toDoOwner) {
+                throw new NotFound('ToDo not found');
+            }
+
+            if (toDoOwner._id.toString() !== userRequesterId) {
+                throw new Unauthorized('You are not allowed to update this ToDo');
+            }
+
+            const toDo = await ToDo.findOneAndDelete(id);
+
+            if(!toDo){
+                throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
+            }
+
+            return toDo;
         } catch (error) {
             throw adaptMongooseError(error);
         }
