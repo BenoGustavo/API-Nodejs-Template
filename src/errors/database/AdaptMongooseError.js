@@ -19,7 +19,7 @@ export function adaptMongooseError(error) {
     } else if (error.code && error.code === 11000) {
         return new BadRequest('Unique key violation, duplicate key');
     } else if (error instanceof mongoose.Error.CastError) {
-        return new InvalidIdError(`Invalid attribute ${error.path}: ${error.kind}`);
+        return new NotFound(`Invalid attribute ${error.path}: ${error.kind}`);
     } else if (error instanceof mongoose.Error.DocumentNotFoundError) {
         return new NotFound('Document not found');
     } else {
