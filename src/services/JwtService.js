@@ -9,7 +9,7 @@ if (JWT_SECRET === 'default_test_secret') {
 export class JwtService {
     static generateToken(user) {
         return jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-            expiresIn: '1h',
+            expiresIn: (process.env.JWT_EXPIRATION_TIME || '1') + 'h',
         });
     }
 
