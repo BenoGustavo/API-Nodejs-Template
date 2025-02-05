@@ -62,12 +62,24 @@ export class ToDoService {
 
     /**
      * Gets all ToDos from a list
+     * 
+     * @param {string} userRequesterId
      * @param {string} id
      * @returns {List<ToDo[]>}
      */
-    async getToDosByListId(id) {
+    async getToDosByListId(userRequesterId,id) {
         try {
-            return await List.findById(id).populate('items');
+            const list = await List.findById(id).populate('items');
+            
+            if(!list){
+                throw new NotFound("To-do List not found, parhaps it doesn't exists or the id might be invalid")
+            }
+
+            if (list.user != userRequesterId) {
+                throw new Unauthorized('You are not allowed to view this list because its not yours, try creating a new list');
+            }
+
+            return list
         } catch (error) {
             throw adaptMongooseError(error);
         }
@@ -75,17 +87,27 @@ export class ToDoService {
 
     /**
      * Gets a ToDo by id
+     * 
+     * @param {string} userRequesterId
      * @param {string} id
      * @returns {ToDo}
      */
-    async getToDoById(id) {
+    async getToDoById(userRequesterId,id) {
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new InvalidIdError('Invalid ID format');
+            throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
         }
+
         const toDo = await ToDo.findById(id);
+        const list = await List.findOne({ items: id });
+
         if (!toDo) {
             throw new NotFound('ToDo not found');
         }
+
+        if (list.user != userRequesterId) {
+            throw new Unauthorized('You are not allowed to view this ToDo');
+        }
+
         return toDo;
     }
 
@@ -98,7 +120,8 @@ export class ToDoService {
      */
     async updateToDo(id,userRequesterId,data) {
         try {
-            const toDoOwner = await List.findOne({ items: id })
+            const toDoList = await List.findOne({ items: id });
+            const toDoOwner = toDoList.user ?? null;
 
             if (!toDoOwner) {
                 throw new NotFound('ToDo not found');
@@ -129,7 +152,8 @@ export class ToDoService {
     async deleteToDo(userRequesterId,id) {
         try {
 
-            const toDoOwner = await List.findOne({ items: id })
+            const toDoList = await List.findOne({ items: id })
+            const toDoOwner = toDoList.user ?? null;
 
             if (!toDoOwner) {
                 throw new NotFound('ToDo not found');

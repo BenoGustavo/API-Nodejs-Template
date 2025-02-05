@@ -56,11 +56,7 @@ export class ToDoController {
 
    async getToDosByListId(req, res, next) {
          try {
-              const toDos = await this.toDoService.getToDosByListId(req.params.id);
-
-              if(!toDos){
-                throw new NotFound("To-do List not found, parhaps it doesn't exists or the id might be invalid")
-              }
+              const toDos = await this.toDoService.getToDosByListId(req.user.id,req.params.id);
 
               res.status(200).json(toDos);
          } catch (error) {
@@ -79,7 +75,7 @@ export class ToDoController {
     */
     async getToDoById(req, res, next) {
         try {
-            const toDo = await this.toDoService.getToDoById(req.params.id);
+            const toDo = await this.toDoService.getToDoById(req.user.id,req.params.id);
             if (!toDo) {
                 return res.status(404).json({ error: 'ToDo not found' });
             }
