@@ -25,7 +25,7 @@ export class UserService {
             user.email = data.email;
             user.password = data.password;
             user.lists = [];
-
+            
 
             await user.save();
             const token = JwtService.generateToken(user);
