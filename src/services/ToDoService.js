@@ -4,7 +4,7 @@ import { TodoDto } from '../dto/TodoDto';
 import mongoose from 'mongoose';
 import { InvalidIdError } from '../errors/InvalidIdError';
 import { NotFound } from '../errors/http/NotFound';
-import { BadRequest } from '../errors/http/BadRequest';
+// import { BadRequest } from '../errors/http/BadRequest';
 import { adaptMongooseError } from '../errors/database/AdaptMongooseError';
 
 export class ToDoService {
@@ -18,16 +18,16 @@ export class ToDoService {
 
     /**
      * Creates a new ToDo
+     * @param {string} listId
      * @param {TodoDto} data
      * @returns {ToDo}
      */
-    async createToDo(data) {
+    async createToDo(listId,data) {
         try {
-            const listId = data.listId;
             const list = await List.findById(listId);
 
             if (!list) {
-                throw new BadRequest('List not found');
+                throw new NotFound('List not found');
             }
 
             const toDo = new ToDo(data);

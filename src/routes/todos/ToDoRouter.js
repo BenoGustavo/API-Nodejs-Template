@@ -7,7 +7,7 @@ const router = Router();
 const toDoService = new ToDoService();
 const toDoController = new ToDoController(toDoService);
 
-router.post("/",authMiddleware,toDoController.createToDo);
+router.post("/:listId",authMiddleware,toDoController.createToDo);
 router.get("/",authMiddleware,toDoController.getToDos);
 router.get("/:id", authMiddleware,toDoController.getToDoById);
 router.get("/list/:id",authMiddleware,toDoController.getToDosByListId);

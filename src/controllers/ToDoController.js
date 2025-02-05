@@ -1,3 +1,4 @@
+import { NotFound } from "../errors/http/NotFound";
 import { ToDoService } from "../services/ToDoService";
 
 export class ToDoController {
@@ -28,7 +29,7 @@ export class ToDoController {
     */
     async createToDo(req, res, next) {
         try {
-            const toDo = await this.toDoService.createToDo(req.body);
+            const toDo = await this.toDoService.createToDo(req.params.listId,req.body);
             res.status(201).json(toDo);
         } catch (error) {
             next(error);
@@ -56,6 +57,11 @@ export class ToDoController {
    async getToDosByListId(req, res, next) {
          try {
               const toDos = await this.toDoService.getToDosByListId(req.params.id);
+
+              if(!toDos){
+                throw new NotFound("To-do List not found, parhaps it doesn't exists or the id might be invalid")
+              }
+
               res.status(200).json(toDos);
          } catch (error) {
               next(error);

@@ -29,7 +29,7 @@ describe('ToDoController', () => {
 
             await toDoController.createToDo(req, res, next);
 
-            expect(toDoService.createToDo).toHaveBeenCalledWith(req.body);
+            expect(toDoService.createToDo).toHaveBeenCalledWith(req.params.listId,req.body);
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(toDo);
         });
