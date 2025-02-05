@@ -8,9 +8,9 @@ const listService = new ListService();
 const listController = new ListController(listService);
 
 router.post('/', authMiddleware, listController.createList);
-router.get('/', (req, res, next) => listController.getLists(req, res, next));
-router.get('/:id', (req, res, next) => listController.getListById(req, res, next));
-router.put('/:id', (req, res, next) => listController.updateList(req, res, next));
-router.delete('/:id', (req, res, next) => listController.deleteList(req, res, next));
+router.get('/',authMiddleware, listController.getLists);
+router.get('/:id',authMiddleware, listController.getListById);
+router.put('/:id',authMiddleware, listController.updateList);
+router.delete('/:id',authMiddleware, listController.deleteList);
 
 export { router as listRouter };

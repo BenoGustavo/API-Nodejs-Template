@@ -1,16 +1,17 @@
 import { Router } from "express";
 import { ToDoController } from "../../controllers/ToDoController";
 import { ToDoService } from "../../services/ToDoService";
+import { authMiddleware } from '../../middlewares/AuthMiddleware';
 
 const router = Router();
 const toDoService = new ToDoService();
 const toDoController = new ToDoController(toDoService);
 
-router.post("/", (req, res, next) => toDoController.createToDo(req, res, next));
-router.get("/", (req, res, next) => toDoController.getToDos(req, res, next));
-router.get("/:id", (req, res, next) => toDoController.getToDoById(req, res, next));
-router.get("/list/:id", (req, res, next) => toDoController.getToDosByListId(req, res, next));
-router.put("/:id", (req, res, next) => toDoController.updateToDo(req, res, next));
-router.delete("/:id", (req, res, next) => toDoController.deleteToDo(req, res, next));
+router.post("/",authMiddleware,toDoController.createToDo);
+router.get("/",authMiddleware,toDoController.getToDos);
+router.get("/:id", authMiddleware,toDoController.getToDoById);
+router.get("/list/:id",authMiddleware,toDoController.getToDosByListId);
+router.put("/:id",authMiddleware,toDoController.updateToDo);
+router.delete("/:id",authMiddleware,toDoController.deleteToDo);
 
 export { router as toDoRouter };
