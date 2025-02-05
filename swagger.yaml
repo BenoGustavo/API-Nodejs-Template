@@ -1,0 +1,532 @@
+openapi: 3.0.0
+info:
+  title: ToDo List API
+  description: API documentation for the ToDo List application
+  version: 1.0.0
+servers:
+  - url: http://localhost:3333/api
+paths:
+  /list:
+    post:
+      summary: Create a new list
+      tags:
+        - Lists
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListDto"
+      responses:
+        "201":
+          description: List created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/List"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+    get:
+      summary: Get all lists
+      tags:
+        - Lists
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: A list of lists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/List"
+        "401":
+          description: Unauthorized
+  /list/{id}:
+    get:
+      summary: Get a list by ID
+      tags:
+        - Lists
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/List"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+    put:
+      summary: Update a list by ID
+      tags:
+        - Lists
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListDto"
+      responses:
+        "200":
+          description: List updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/List"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+    delete:
+      summary: Delete a list by ID
+      tags:
+        - Lists
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: List deleted successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+  /todo:
+    get:
+      summary: Get all todos
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: A list of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ToDo"
+        "401":
+          description: Unauthorized
+  /todo/{id}:
+    get:
+      summary: Get a todo by ID
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single todo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+    put:
+      summary: Update a todo by ID
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToDoDto"
+      responses:
+        "200":
+          description: ToDo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+    delete:
+      summary: Delete a todo by ID
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: ToDo deleted successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+  /todo/list/{id}:
+    get:
+      summary: Get all todos by list ID
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of todos for the specified list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ToDo"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+  /todo/{listId}:
+    post:
+      summary: Create a new todo in a list
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToDoDto"
+      responses:
+        "201":
+          description: ToDo created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToDo"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+  /user/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDto"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad Request
+  /user/login:
+    post:
+      summary: Login a user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithToken"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+  /user/recover-password:
+    post:
+      summary: Recover password
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecoverPasswordDto"
+      responses:
+        "200":
+          description: Password recovery token sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        "400":
+          description: Bad Request
+  /user/send-recover-password-token/{email}:
+    post:
+      summary: Send password recovery token
+      tags:
+        - Users
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Password recovery token sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        "400":
+          description: Bad Request
+  /user/{id}:
+    get:
+      summary: Get a user by ID
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+  /user/username/{username}:
+    get:
+      summary: Get a user by username
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+  /user/email/{email}:
+    get:
+      summary: Get a user by email
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+components:
+  schemas:
+    ListDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "My List"
+    List:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            type: string
+        user:
+          type: string
+    ToDoDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "My ToDo"
+        description:
+          type: string
+          example: "This is a description"
+        dueDate:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+        completed:
+          type: boolean
+          example: false
+    ToDo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        completed:
+          type: boolean
+        list:
+          type: string
+    UserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "johndoe"
+        email:
+          type: string
+          example: "johndoe@example.com"
+        password:
+          type: string
+          example: "password123"
+    LoginDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "johndoe"
+        password:
+          type: string
+          example: "password123"
+    RecoverPasswordDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "johndoe@example.com"
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        lists:
+          type: array
+          items:
+            type: string
+    UserWithToken:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
