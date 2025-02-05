@@ -101,6 +101,11 @@ export class ToDoController {
     async updateToDo(req, res, next) {
         try {
             const toDo = await this.toDoService.updateToDo(req.params.id, req.body);
+
+            if(!toDo){
+                throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
+            }
+
             res.status(200).json(toDo);
         } catch (error) {
             next(error);
@@ -118,7 +123,12 @@ export class ToDoController {
     */
     async deleteToDo(req, res, next) {
         try {
-            await this.toDoService.deleteToDo(req.params.id);
+            const toDo = await this.toDoService.deleteToDo(req.params.id);
+
+            if(!toDo){
+                throw new NotFound("To-do not found, parhaps it doesn't exists or the id might be invalid")
+            }
+
             res.status(204).send();
         } catch (error) {
             next(error);
