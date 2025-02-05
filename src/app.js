@@ -5,6 +5,7 @@ import cors from 'cors';
 import './database/Connection';
 import routes from './routes';
 import { GlobalErrorHandler } from './middlewares/GlobalErrorHandler'; 
+import { swaggerMiddleware } from './middlewares/SwaggerMiddleware';
 
 /**
  * Base app - class based.
@@ -24,6 +25,9 @@ class App {
     this.server.disable('x-powered-by');
     this.server.use(cors());
     this.server.use(express.json());
+
+    // Swagger documentation route
+    this.server.use('/api/docs', swaggerMiddleware);
   }
 
   /**
