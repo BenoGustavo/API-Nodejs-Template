@@ -13,6 +13,7 @@ import { swaggerMiddleware } from './middlewares/SwaggerMiddleware';
 class App {
   constructor() {
     this.server = express();
+    this.setRoot();
     this.middlewares();
     this.routes();
     this.errorHandling();
@@ -35,6 +36,25 @@ class App {
    */
   routes() {
     this.server.use(process.env.NAMESPACING, routes);
+  }
+
+  /**
+   * Root route definition
+   */
+  setRoot() {
+    this.server.get('/', (req, res) => {
+      res.json(
+        {
+          message: 'Welcome to the to-do list API',
+          status: 'success',
+          data: {
+            version: '1.0.0',
+            documentation: req.protocol + '://' + req.get('host') + '/api/docs',
+            ping: req.protocol + '://' + req.get('host') + '/api/ping'
+          }
+        }
+      );
+    });
   }
 
   /**
