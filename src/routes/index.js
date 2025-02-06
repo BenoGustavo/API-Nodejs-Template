@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { NotFound } from '../errors/http/NotFound';
-import { sayHelloWorld } from './ping/helloWorld';
+import { sayPong } from './ping/pong';
 
 // Routers
 import { listRouter } from './list/ListRouter';
@@ -9,7 +9,7 @@ import { userRouter } from './user/UserRouter';
 
 // start of routes
 const routes = new Router();
-routes.get('/', sayHelloWorld);
+routes.get('/ping', sayPong);
 routes.use('/list', listRouter);
 routes.use('/todo', toDoRouter);
 routes.use('/user', userRouter);
