@@ -3,7 +3,6 @@ import { UserService } from "../services/UserService";
 import { ResponseDto } from "../dto/response/ResponseDto";
 import { Unauthorized } from "../errors/http/Unauthorized";
 import { NotFound } from "../errors/http/NotFound";
-import emailSenderInstance from "../components/EmailSender";
 
 jest.mock("../services/UserService");
 jest.mock("../components/EmailSender");
