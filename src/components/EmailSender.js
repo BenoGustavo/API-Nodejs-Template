@@ -92,7 +92,7 @@ class EmailSender {
 	 * @returns
 	 */
 	async sendEmail(emailContent) {
-		return transporter.sendMail(emailContent, (error, info) => {
+		return this.transporter.sendMail(emailContent, (error, info) => {
 			if (error) {
 				console.error("\n ❌ Email sending failed ❌:\n" + error + "\n");
 			} else {
