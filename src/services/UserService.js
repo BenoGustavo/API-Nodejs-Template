@@ -143,7 +143,11 @@ export class UserService {
 		user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
 		// Should send an email with the token
-		console.log(`\n🔑 Password recovery token for ${user.email}: ${token} 🔑'`);
+		if (process.env.NODE_ENV === "development") {
+			console.log(
+				`\n🔑 Password recovery token for ${user.email}: ${token} 🔑'`
+			);
+		}
 
 		await user.save();
 		return token;
