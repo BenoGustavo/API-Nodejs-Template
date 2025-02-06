@@ -25,7 +25,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/List"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "400":
@@ -42,9 +42,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/List"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
   /list/{id}:
@@ -66,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/List"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -95,7 +93,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/List"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -132,9 +130,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ToDo"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
   /todo/{id}:
@@ -156,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ToDo"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -178,14 +174,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ToDoDto"
+              $ref: "#/components/schemas/TodoDto"
       responses:
         "200":
           description: ToDo updated successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ToDo"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -228,9 +224,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ToDo"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -253,14 +247,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ToDoDto"
+              $ref: "#/components/schemas/TodoDto"
       responses:
         "201":
           description: ToDo created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ToDo"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "400":
@@ -275,14 +269,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserDto"
+              $ref: "#/components/schemas/UserRegisterDto"
       responses:
         "201":
           description: User registered successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/ResponseDto"
         "400":
           description: Bad Request
   /user/login:
@@ -295,14 +289,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginDto"
+              $ref: "#/components/schemas/UserLoginDto"
       responses:
         "200":
           description: User logged in successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserWithToken"
+                $ref: "#/components/schemas/ResponseDto"
         "400":
           description: Bad Request
         "401":
@@ -317,17 +311,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecoverPasswordDto"
+              $ref: "#/components/schemas/UserResetPasswordDto"
       responses:
         "200":
           description: Password recovery token sent
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
+                $ref: "#/components/schemas/ResponseDto"
         "400":
           description: Bad Request
   /user/send-recover-password-token/{email}:
@@ -347,10 +338,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
+                $ref: "#/components/schemas/ResponseDto"
         "400":
           description: Bad Request
   /user/{id}:
@@ -372,7 +360,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -396,7 +384,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -420,7 +408,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/ResponseDto"
         "401":
           description: Unauthorized
         "404":
@@ -433,52 +421,25 @@ components:
         name:
           type: string
           example: "My List"
-    List:
+    TodoDto:
       type: object
       properties:
-        id:
-          type: string
         name:
           type: string
-        items:
-          type: array
-          items:
-            type: string
-        user:
-          type: string
-    ToDoDto:
-      type: object
-      properties:
-        title:
-          type: string
           example: "My ToDo"
-        description:
-          type: string
-          example: "This is a description"
-        dueDate:
-          type: string
-          format: date-time
-          example: "2023-12-31T23:59:59Z"
-        completed:
+        done:
           type: boolean
           example: false
-    ToDo:
+    UserLoginDto:
       type: object
       properties:
-        id:
+        email:
           type: string
-        title:
+          example: "johndoe@example.com"
+        password:
           type: string
-        description:
-          type: string
-        dueDate:
-          type: string
-          format: date-time
-        completed:
-          type: boolean
-        list:
-          type: string
-    UserDto:
+          example: "password123"
+    UserRegisterDto:
       type: object
       properties:
         username:
@@ -490,41 +451,36 @@ components:
         password:
           type: string
           example: "password123"
-    LoginDto:
-      type: object
-      properties:
-        username:
-          type: string
-          example: "johndoe"
-        password:
+        confirmPassword:
           type: string
           example: "password123"
-    RecoverPasswordDto:
+    UserResetPasswordDto:
       type: object
       properties:
-        email:
+        password:
           type: string
-          example: "johndoe@example.com"
-    User:
+          example: "newpassword123"
+        confirmPassword:
+          type: string
+          example: "newpassword123"
+        resetPasswordToken:
+          type: string
+          example: "reset-token"
+    ResponseDto:
       type: object
       properties:
-        id:
+        status:
+          type: integer
+          example: 200
+        message:
           type: string
-        username:
-          type: string
-        email:
-          type: string
-        lists:
-          type: array
-          items:
-            type: string
-    UserWithToken:
-      type: object
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-        token:
-          type: string
+          example: "Success"
+        data:
+          type: object
+          nullable: true
+        error:
+          type: object
+          nullable: true
   securitySchemes:
     bearerAuth:
       type: http
