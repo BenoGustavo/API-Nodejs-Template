@@ -91,8 +91,6 @@ export class UserController {
 
 	async sendRecoverPasswordToken(req, res, next) {
 		try {
-			console.log(this.constructor.name);
-
 			const token = await this.userService.sendRecoverPasswordToken(
 				req.params.email
 			);
