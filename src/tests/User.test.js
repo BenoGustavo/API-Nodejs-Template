@@ -39,10 +39,7 @@ describe("UserController", () => {
 
 			await userController.register(req, res, next);
 
-			expect(userService.register).toHaveBeenCalledWith(
-				req.body,
-				req.get("origin")
-			);
+			expect(userService.register).toHaveBeenCalledWith(req.body);
 			expect(res.status).toHaveBeenCalledWith(201);
 			expect(res.json).toHaveBeenCalledWith(
 				new ResponseDto(201, "User registered successfully", { token, user })
