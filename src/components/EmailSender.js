@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { InvalidEnvError } from "../errors/InvalidEnvError";
+import fs from "fs";
 
 /**
  * This class represents an email object
@@ -84,6 +85,27 @@ class EmailSender {
 	 */
 	createNewEmail(to, subject, text, html) {
 		return new Email(to, subject, text, html);
+	}
+
+	/**
+	 * Load an email template from a file and replace the placeholders with the values
+	 *
+	 *
+	 * The placeholders should be in the format {{placeholder}}
+	 *
+	 * @param {string} templatePath
+	 * @param {object} valuesToReplace
+	 * valuesToReplace is an object with the placeholders as keys and the values as values
+	 * @returns {string}
+	 */
+	loadEmailTemplate(templatePath, valuesToReplace) {
+		let htmlTemplate = fs.readFileSync(templatePath, "utf8");
+
+		for (const [key, value] of Object.entries(valuesToReplace)) {
+			htmlTemplate = htmlTemplate.replace("{{" + key + "}}", value);
+		}
+
+		return htmlTemplate;
 	}
 
 	/**
