@@ -23,10 +23,7 @@ export class UserController {
 
 	async register(req, res, next) {
 		try {
-			const { user, token } = await this.userService.register(
-				req.body,
-				req.get("origin")
-			);
+			const { user, token } = await this.userService.register(req.body);
 
 			const response = new ResponseDto(201, "User registered successfully", {
 				token,

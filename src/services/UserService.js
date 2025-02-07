@@ -1,6 +1,5 @@
 import { User } from "../database/models/UserSchema";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import { adaptMongooseError } from "../errors/database/AdaptMongooseError";
 import { JwtService } from "./JwtService";
 import { UserRegisterDto } from "../dto/user/UserRegisterDto";
@@ -9,20 +8,21 @@ import { UserResetPasswordDto } from "../dto/user/UserResetPasswordDto";
 import { BadRequest } from "../errors/http/BadRequest";
 import { NotFound } from "../errors/http/NotFound";
 import { emailSenderInstance } from "../components/EmailSender";
+import { generateRandomCode } from "../utils/GenerateRandomCode";
+import path from "path";
 
 export class UserService {
 	/**
 	 * Register a new user
 	 * @param {UserRegisterDto} data
-	 * @param {string} baseUrl
 	 **/
-	async register(data, baseUrl) {
+	async register(data) {
 		try {
 			if (data.password !== data.confirmPassword) {
 				throw new BadRequest("Passwords do not match");
 			}
 
-			const token = crypto.randomBytes(35).toString("hex");
+			const token = generateRandomCode(35);
 
 			const user = new User();
 			user.username = data.username;
@@ -45,9 +45,22 @@ export class UserService {
 			const jwtToken = JwtService.generateToken(user);
 
 			// Should send an email with the token
-			//TODO: SHOULD SEND THE USER TO THE FRONT-END TO ACTIVATE THE ACCOUNT
-			const accountActivationUrl = `${baseUrl}/api/user/activate-account/${token}`;
+			const accountActivationUrl = `${process.env.BACKEND_URL}/api/user/activate-account/${token}`;
 
+			// Read the HTML template
+			const templatePath = path.resolve(
+				__dirname,
+				"../templates/email/accountActivationEmail.html"
+			);
+
+			// Get the HTML template
+			const htmlTemplate = emailSenderInstance.loadEmailTemplate(templatePath, {
+				username: user.username,
+				activationUrl: accountActivationUrl,
+				year: new Date().getFullYear(),
+			});
+
+			// Create the email
 			const email = emailSenderInstance.createNewEmail(
 				user.email,
 				"Account activation",
@@ -55,12 +68,10 @@ export class UserService {
 					`Please click on the following link to activate your account:\n\n` +
 					`${accountActivationUrl}\n\n` +
 					"If you did not request this, please ignore this email and your password will remain unchanged.\n",
-				`Hello <b>${user.username}</b>,<br><br>` +
-					`Please click on the following link to activate your account:<br><br>` +
-					`<a href="${accountActivationUrl}">Activate account</a><br><br>` +
-					"If you did not request this, please ignore this email and your password will remain unchanged.<br>"
+				htmlTemplate
 			);
 
+			// Send the email
 			emailSenderInstance.sendEmail(email);
 
 			return { user, jwtToken };
@@ -74,9 +85,9 @@ export class UserService {
 	 * @param {string} token
 	 * @returns
 	 */
-	async activateAccount(token) {
+	async activateAccount(userToken) {
 		const user = await User.findOne({
-			accountActivationToken: token,
+			accountActivationToken: userToken,
 			accountActivationTokenExpires: { $gt: Date.now() },
 		});
 
@@ -92,7 +103,9 @@ export class UserService {
 			throw adaptMongooseError(error);
 		}
 
-		return user;
+		const token = JwtService.generateToken(user);
+
+		return { token, user };
 	}
 
 	/**
@@ -138,7 +151,7 @@ export class UserService {
 		if (!user) {
 			throw new NotFound("User not found");
 		}
-		const token = crypto.randomBytes(15).toString("hex");
+		const token = generateRandomCode(15);
 		user.resetPasswordToken = token;
 		user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
@@ -149,6 +162,37 @@ export class UserService {
 			);
 		}
 
+		// Todo: Send the user to the front-end to reset the password
+		// const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+		const resetPasswordUrl = token;
+
+		// Read the HTML template
+		const templatePath = path.resolve(
+			__dirname,
+			"../templates/email/recoverPasswordEmail.html"
+		);
+
+		// Get the HTML template
+		const htmlTemplate = emailSenderInstance.loadEmailTemplate(templatePath, {
+			username: user.username,
+			resetPasswordUrl: resetPasswordUrl,
+			year: new Date().getFullYear(),
+		});
+
+		// Create the email
+		const emailContent = emailSenderInstance.createNewEmail(
+			user.email,
+			"Password Recovery",
+			`Hello ${user.username},\n\n` +
+				`Please click on the following link to recover your password:\n\n` +
+				`${resetPasswordUrl}\n\n` +
+				"If you did not request this, please ignore this email and your password will remain unchanged.\n",
+			htmlTemplate
+		);
+
+		// Send the email
+		emailSenderInstance.sendEmail(emailContent);
+
 		await user.save();
 		return token;
 	}
@@ -158,14 +202,14 @@ export class UserService {
 	 * @param {UserResetPasswordDto} data
 	 **/
 	async recoverPassword(data) {
-		const { token, password, confirmPassword } = data;
+		const { resetPasswordToken, password, confirmPassword } = data;
 
 		if (password !== confirmPassword) {
 			throw new BadRequest("Passwords do not match");
 		}
 
 		const user = await User.findOne({
-			resetPasswordToken: token,
+			resetPasswordToken: resetPasswordToken,
 			resetPasswordExpires: { $gt: Date.now() },
 		});
 
