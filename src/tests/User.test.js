@@ -208,7 +208,8 @@ describe("UserController", () => {
 				req.query.limit,
 				req.query.sort,
 				req.query.order,
-				req.query.search
+				req.query.search,
+				req.user.id
 			);
 			expect(res.status).toHaveBeenCalledWith(200);
 			expect(res.json).toHaveBeenCalledWith(
