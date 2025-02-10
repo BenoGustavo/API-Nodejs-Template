@@ -5,6 +5,8 @@ import { InvalidIdError } from "../errors/InvalidIdError";
 import { NotFound } from "../errors/http/NotFound";
 import { Unauthorized } from "../errors/http/Unauthorized";
 import { adaptMongooseError } from "../errors/database/AdaptMongooseError";
+import { User } from "../database/models/UserSchema";
+import { Forbidden } from "../errors/http/Forbidden";
 
 export class ListService {
 	constructor() {
@@ -32,14 +34,18 @@ export class ListService {
 
 	/**
 	 * Gets all lists
+	 * @param {string} userRequesterId
+	 *
 	 * @returns {List}
 	 */
-	async getLists() {
-		try {
-			return await List.find();
-		} catch (error) {
-			throw adaptMongooseError(error);
+	async getLists(userRequesterId) {
+		const user = await User.findById(userRequesterId);
+
+		if (!(user.role === "admin")) {
+			throw new Forbidden("You're not authorized to access this list");
 		}
+
+		return await List.find();
 	}
 
 	/**
