@@ -42,7 +42,9 @@ export class ListService {
 		const user = await User.findById(userRequesterId);
 
 		if (!(user.role === "admin")) {
-			throw new Forbidden("You're not authorized to access this list");
+			throw new Forbidden(
+				"You're not authorized to access this route, because you don't have the necessary permissions"
+			);
 		}
 
 		return await List.find();
