@@ -26,6 +26,6 @@ router.get(
 );
 
 router.get("/email/:email", authMiddleware, userController.getUserByEmail);
-router.get("/", userController.getAllUsers);
+router.get("/", authMiddleware, userController.getAllUsers);
 
 export { router as userRouter };

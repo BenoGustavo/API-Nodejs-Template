@@ -9,6 +9,7 @@ import { BadRequest } from "../errors/http/BadRequest";
 import { NotFound } from "../errors/http/NotFound";
 import { emailSenderInstance } from "../components/EmailSender";
 import { generateRandomCode } from "../utils/GenerateRandomCode";
+import { Forbidden } from "../errors/http/Forbidden";
 import path from "path";
 
 export class UserService {
@@ -261,14 +262,24 @@ export class UserService {
 	 * @param {string} sort
 	 * @param {string} order
 	 * @param {string} search
+	 * @param {string} userRequesterId
 	 **/
 	async getAllUsers(
 		page = 1,
 		limit = 10,
 		sort = "createdAt",
 		order = "desc",
-		search = ""
+		search = "",
+		userRequesterId
 	) {
+		const user = await User.findById(userRequesterId);
+
+		if (!(user.role === "admin")) {
+			throw new Forbidden(
+				"You're not authorized to access this route, because you don't have the necessary permissions"
+			);
+		}
+
 		const query = {};
 		if (search) {
 			query.$or = [

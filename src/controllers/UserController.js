@@ -131,7 +131,8 @@ export class UserController {
 				req.query.limit,
 				req.query.sort,
 				req.query.order,
-				req.query.search
+				req.query.search,
+				req.user.id
 			);
 
 			const response = new ResponseDto(200, "Users found", users);
