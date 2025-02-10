@@ -31,7 +31,7 @@ paths:
         "400":
           description: Bad Request
     get:
-      summary: Get all lists
+      summary: Get all lists (SHOULD HAVE ROLE ADMIN, CHANGE YOUR ROLE ON THE DATABASE MANUALLY)
       tags:
         - Lists
       security:
@@ -119,7 +119,7 @@ paths:
           description: Not Found
   /todo:
     get:
-      summary: Get all todos
+      summary: Get all todos (SHOULD HAVE ROLE ADMIN, CHANGE YOUR ROLE ON THE DATABASE MANUALLY)
       tags:
         - Todos
       security:
@@ -261,7 +261,7 @@ paths:
           description: Bad Request
   /user/:
     get:
-      summary: Get all users
+      summary: Get all users (SHOULD HAVE ROLE ADMIN, CHANGE YOUR ROLE ON THE DATABASE MANUALLY)
       tags:
         - Users
       security:
