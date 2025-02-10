@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
 	resetPasswordToken: { type: String },
 	resetPasswordExpires: { type: Date },
 	lists: [{ type: mongoose.Schema.Types.ObjectId, ref: "List" }],
+	role: { type: String, default: "user" },
 });
 
 // Hash the password before saving the user
